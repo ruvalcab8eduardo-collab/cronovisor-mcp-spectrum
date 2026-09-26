@@ -1,0 +1,72 @@
+{
+  "bands": [
+    {
+      "id": "radio",
+      "name": "Radio",
+      "freq_low_hz": 3000,
+      "freq_high_hz": 300000000000,
+      "wavelength": "100 km – 1 mm",
+      "energy_role": "low",
+      "temporal_channel": "past",
+      "color": "#4a90d9",
+      "description": "Long waves carry echoes of past events. Used for archives, radio signals, and historical records."
+    },
+    {
+      "id": "infrared",
+      "name": "Infrared",
+      "freq_low_hz": 300000000000,
+      "freq_high_hz": 430000000000000,
+      "wavelength": "1 mm – 700 nm",
+      "energy_role": "low-medium",
+      "temporal_channel": "present",
+      "color": "#e85d04",
+      "description": "Thermal signatures of what is happening right now. Heat, activity, live sensors."
+    },
+    {
+      "id": "visible",
+      "name": "Visible Light",
+      "freq_low_hz": 430000000000000,
+      "freq_high_hz": 750000000000000,
+      "wavelength": "700 – 400 nm",
+      "energy_role": "medium",
+      "temporal_channel": "present",
+      "color": "#ffffff",
+      "description": "The narrow band human eyes see. Real-time observation of the current moment."
+    },
+    {
+      "id": "ultraviolet",
+      "name": "Ultraviolet",
+      "freq_low_hz": 750000000000000,
+      "freq_high_hz": 30000000000000000,
+      "wavelength": "400 – 10 nm",
+      "energy_role": "medium-high",
+      "temporal_channel": "future",
+      "color": "#9d4edd",
+      "description": "Short-term future trends, UV damage, near-horizon projections."
+    },
+    {
+      "id": "xray",
+      "name": "X-Ray",
+      "freq_low_hz": 30000000000000000,
+      "freq_high_hz": 30000000000000000000,
+      "wavelength": "10 nm – 0.01 nm",
+      "energy_role": "high",
+      "temporal_channel": "future",
+      "color": "#ff006e",
+      "description": "High-energy scenarios. Deep future projections and rare events."
+    },
+    {
+      "id": "gamma",
+      "name": "Gamma Ray",
+      "freq_low_hz": 30000000000000000000,
+      "freq_high_hz": null,
+      "wavelength": "< 0.01 nm",
+      "energy_role": "extreme",
+      "temporal_channel": "future",
+      "color": "#ffbe0b",
+      "description": "Extreme, high-impact scenarios. The highest energy, lowest probability events."
+    }
+  ],
+  "temporal_modes": ["past", "present", "future"],
+  "mcp_endpoint": "mcp_server.py"
+}

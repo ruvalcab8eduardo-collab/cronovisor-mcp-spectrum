@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronovisor — MCP Spectrum</title>
+<style>
+  :root {
+    --bg: #05060f;
+    --panel: #0d1126;
+    --gold: #ffd166;
+    --cyan: #4cc9f0;
+    --text: #e8eaf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #0a0e27 0%, var(--bg) 70%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 2.4rem;
+    background: linear-gradient(90deg, var(--gold), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  header p { opacity: 0.7; margin-top: 6px; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    margin-bottom: 24px;
+  }
+  select, button {
+    background: var(--panel); color: var(--text);
+    border: 1px solid #2a2f55; border-radius: 10px;
+    padding: 12px 16px; font-size: 1rem; cursor: pointer;
+  }
+  button {
+    background: linear-gradient(90deg, #1a3a6b, #2a5a9b);
+    border: none; font-weight: 600;
+  }
+  button:hover { filter: brightness(1.15); }
+  .spectrum {
+    display: flex; height: 48px; border-radius: 12px; overflow: hidden;
+    margin-bottom: 24px; box-shadow: 0 0 30px rgba(76,201,240,0.15);
+  }
+  .band { flex: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; color: #05060f; text-shadow: 0 0 4px rgba(255,255,255,0.5); }
+  .viewer {
+    background: var(--panel); border: 1px solid #2a2f55; border-radius: 16px;
+    padding: 28px; max-width: 760px; margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .orb {
+    width: 180px; height: 180px; border-radius: 50%; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; transition: all 0.6s ease;
+    box-shadow: 0 0 60px currentColor, inset 0 0 40px rgba(255,255,255,0.2);
+  }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .meta div { background: #111633; padding: 12px; border-radius: 10px; }
+  .meta span { display: block; font-size: 0.75rem; opacity: 0.6; text-transform: uppercase; }
+  .meta strong { font-size: 1.1rem; }
+  .observation {
+    background: #111633; border-left: 3px solid var(--cyan);
+    padding: 16px; border-radius: 8px; line-height: 1.6;
+  }
+  .confidence { margin-top: 12px; font-size: 0.85rem; opacity: 0.7; }
+  .disclaimer { margin-top: 16px; font-size: 0.8rem; opacity: 0.5; font-style: italic; }
+  footer { text-align: center; margin-top: 32px; opacity: 0.4; font-size: 0.8rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>CRONOVISOR</h1>
+    <p>Visor temporal conectado al espectro electromagnético · MCP Energy Spectrum</p>
+  </header>
+
+  <div class="controls">
+    <select id="band"></select>
+    <select id="mode">
+      <option value="past">Pasado</option>
+      <option value="present" selected>Presente</option>
+      <option value="future">Futuro</option>
+    </select>
+    <button onclick="observe()">Sintonizar</button>
+  </div>
+
+  <div class="spectrum" id="spectrum"></div>
+
+  <div class="viewer">
+    <div class="orb" id="orb">⚡</div>
+    <div class="meta">
+      <div><span>Banda</span><strong id="m-band">—</strong></div>
+      <div><span>Modo temporal</span><strong id="m-mode">—</strong></div>
+      <div><span>Energía</span><strong id="m-energy">—</strong></div>
+      <div><span>Longitud de onda</span><strong id="m-wave">—</strong></div>
+    </div>
+    <div class="observation" id="obs">Selecciona una banda y pulsa Sintonizar.</div>
+    <div class="confidence" id="conf"></div>
+    <div class="disclaimer">El futuro no está escrito. Esta máquina muestra escenarios posibles, no destinos fijos.</div>
+  </div>
+
+  <footer>Cronovisor MCP Spectrum · Prototipo científico · 2026</footer>
+
+<script>
+let DATA = null;
+const bandSel = document.getElementById('band');
+const modeSel = document.getElementById('mode');
+const spectrumEl = document.getElementById('spectrum');
+
+fetch('spectrum_data.json')
+  .then(r => r.json())
+  .then(d => {
+    DATA = d;
+    d.bands.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id; opt.textContent = b.name;
+      bandSel.appendChild(opt);
+      const seg = document.createElement('div');
+      seg.className = 'band';
+      seg.style.background = b.color;
+      seg.textContent = b.name;
+      spectrumEl.appendChild(seg);
+    });
+    observe();
+  });
+
+function observe() {
+  if (!DATA) return;
+  const band = DATA.bands.find(b => b.id === bandSel.value);
+  const mode = modeSel.value;
+  const orb = document.getElementById('orb');
+  orb.style.color = band.color;
+  orb.style.background = `radial-gradient(circle, ${band.color}55, ${band.color}11)`;
+  orb.textContent = mode === 'past' ? '📜' : mode === 'present' ? '●' : '✨';
+
+  document.getElementById('m-band').textContent = band.name;
+  document.getElementById('m-mode').textContent = mode === 'past' ? 'Pasado' : mode === 'present' ? 'Presente' : 'Futuro';
+  document.getElementById('m-energy').textContent = band.energy_role;
+  document.getElementById('m-wave').textContent = band.wavelength;
+
+  const obs = {
+    past: `Eco de radio capturado: señal histórica registrada. ${band.description}`,
+    present: `Transmisión en vivo en ${band.name}: actividad actual detectada. ${band.description}`,
+    future: `Proyección vía ${band.name}: escenario modelado. Probabilidad ponderada, no certeza.`
+  };
+  document.getElementById('obs').textContent = obs[mode];
+  const conf = { past: 0.92, present: 0.99, future: 0.61 }[mode];
+  document.getElementById('conf').textContent = `Confianza: ${(conf*100).toFixed(0)}% · ${mode === 'future' ? 'Escenarios, no destinos.' : 'Lectura estable.'}`;
+}
+</script>
+</body>
+</html>
